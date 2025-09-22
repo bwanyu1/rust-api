@@ -1,0 +1,25 @@
+services:
+  rust:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: ${USERNAME:-rust}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    working_dir: /app
+    environment:
+      - CARGO_HOME=/home/${USERNAME:-rust}/.cargo
+      - RUSTUP_HOME=/home/${USERNAME:-rust}/.rustup
+    volumes:
+      - ./:/app
+      # Cache cargo registry/git between runs for faster builds
+      - cargo-home:/home/${USERNAME:-rust}/.cargo
+      # Persist target to avoid full rebuilds
+      - target:/app/target
+    tty: true
+    command: bash -lc "cargo --version && rustc --version && bash"
+
+volumes:
+  cargo-home:
+  target:
